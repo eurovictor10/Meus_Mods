@@ -1,0 +1,6 @@
+{
+  "name": "limite-diario",
+  "version": "0.1.0",
+  "description": "Reparte o limite semanal em 7 dias e mostra quanto dá para gastar hoje",
+  "types": "./types/index.d.ts"
+}
