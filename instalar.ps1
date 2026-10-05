@@ -1,15 +1,11 @@
 ﻿# Instala os mods deste repositório no Claude Code (Windows):
-# baixa o Claude-Fables do autor e aponta o settings.json para as pastas dos mods.
-# Correr de novo atualiza o Claude-Fables para a versão mais recente do autor.
+# aponta o settings.json para as pastas dos mods.
 param(
     [string]$SettingsPath = (Join-Path $HOME '.claude\settings.json')
 )
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-
-git -C $root submodule update --init --remote Claude-Fables
-if ($LASTEXITCODE -ne 0) { throw 'Não consegui baixar o Claude-Fables.' }
 
 $mods = @('Claude-Fables', 'limite-diario') | ForEach-Object { (Join-Path $root $_) -replace '\\', '/' }
 
