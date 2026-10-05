@@ -1,0 +1,4 @@
+[submodule "Claude-Fables"]
+	path = Claude-Fables
+	url = https://github.com/henrik-thevibe/Claude-Fables.git
+	branch = main
