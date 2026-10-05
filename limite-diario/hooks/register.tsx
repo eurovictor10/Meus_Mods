@@ -34,9 +34,17 @@ const statusText = (list: Limit[], at: number) => {
   return room > 0 ? pct(room) : `0% (passou ${pct(-room)})`
 }
 
+const STORE_LIMITS = 'limits'
+
+const hasWeekly = (list: Limit[]) => list.some(limit => limit.kind.startsWith('seven_day'))
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    const list: Limit[] = (await $.session.usage()).rateLimits
+    // A session that just started has no reading until its first response:
+    // show the one the last session left, so the line is there from the start.
+    const live: Limit[] = (await $.session.usage()).rateLimits
+    const saved = await $.store.get(STORE_LIMITS)
+    const list: Limit[] = hasWeekly(live) || !Array.isArray(saved) ? live : saved
     await update($, limits, () => list)
     $.ui.status(statusText(list, Date.now()))
     // The day turns without any usage moving, so the line is redrawn on a timer too.
@@ -47,8 +55,12 @@ export const register: Register = on => {
 
   on('session.measure', async ($, e, next) => {
     const list: Limit[] = e.rateLimits
-    await update($, limits, () => list)
-    $.ui.status(statusText(list, Date.now()))
+
+    if (hasWeekly(list)) {
+      await update($, limits, () => list)
+      await $.store.set(STORE_LIMITS, list)
+      $.ui.status(statusText(list, Date.now()))
+    }
 
     return next(e)
   })
